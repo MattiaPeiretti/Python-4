@@ -63,6 +63,14 @@ def generate_main_menu(current_dictionary):
     menu += '╚' + '═'*(MENU_WIDTH - 2) + '╝\n'
     return menu
 
+def read_wordlists_files(dir=WORDLISTS_FILE_DIR):
+    files = []
+    for filename, x in os.listdir(dir):
+        if filename.endswith(".json"):
+            files[x] = filename
+    if not files:
+        return
+    return files
 
 def check_wordlist():
     pass
@@ -96,21 +104,23 @@ def main():
     main_dict = {}
 
     while True:
+        # print(main_dict)
+        # input()
         print(generate_main_menu(current_dict))
         inp = input("Select option: ")
         if inp == CHECK_WORDLIST:
             check_wordlist()
         elif inp == ADD_TO_WORDLIST:
-
             if current_dict:
                 lang_a, lang_b = get_dict_lang(current_dict)
                 word_a = input('Insert word in {}:'.format(lang_a))
                 word_b = input('Insert word in {}:'.format(lang_b))
+                main_dict[word_a] = word_b
 
         elif inp == DELETE_FROM_WORDLIST:
             pass
         elif inp == SELECT_WORDLIST:
-            pass
+            print(read_wordlists_files())
         elif inp == NEW_WORDLIST:
             current_dict = new_wordlist()
         elif inp == ESCAPE:
