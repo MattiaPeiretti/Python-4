@@ -15,13 +15,17 @@ WORDLISTS_FILE_DIR = 'wordlists/'
 
 MENU_WIDTH = 60
 
-
-
 #write_json({'src':'sedede'}, 'test')
 def write_json(data, filename, filepath=WORDLISTS_FILE_DIR):
     with open(filepath + filename + '.json', 'w', encoding='utf8') as outfile:
         json_str = json.dumps(data, indent=4, sort_keys=True, separators=(',', ': '), ensure_ascii=False)
         outfile.write(str(json_str))
+
+def load_file(filename, dir = WORDLISTS_FILE_DIR):
+    with open(dir+filename) as data_file:
+        data_loaded = json.load(data_file)
+
+
         
 def get_dict_lang(dict_name):
     pos = dict_name.find('2')
@@ -65,9 +69,9 @@ def generate_main_menu(current_dictionary):
 
 def read_wordlists_files(dir=WORDLISTS_FILE_DIR):
     files = []
-    for filename, x in os.listdir(dir):
+    for filename in os.listdir(dir):
         if filename.endswith(".json"):
-            files[x] = filename
+            files.append(filename)
     if not files:
         return
     return files
@@ -120,7 +124,13 @@ def main():
         elif inp == DELETE_FROM_WORDLIST:
             pass
         elif inp == SELECT_WORDLIST:
-            print(read_wordlists_files())
+            files = read_wordlists_files()
+            for x in range(len(files)):
+                print(files[x])
+            inp = input('Enter name: ')
+            if inp:
+
+            
         elif inp == NEW_WORDLIST:
             current_dict = new_wordlist()
         elif inp == ESCAPE:
