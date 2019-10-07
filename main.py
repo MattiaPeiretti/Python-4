@@ -125,12 +125,15 @@ def main():
             pass
         elif inp == SELECT_WORDLIST:
             files = read_wordlists_files()
+            print('\n')
             for x in range(len(files)):
-                print(files[x])
+                print(files[x][0:len(files[x])-5])
+            print('\n')
             inp = input('Enter name: ')
             if inp:
-
-            
+                if inp in files:
+                    print('Found!')
+                    input()
         elif inp == NEW_WORDLIST:
             current_dict = new_wordlist()
         elif inp == ESCAPE:
