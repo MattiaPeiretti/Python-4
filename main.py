@@ -5,7 +5,7 @@ import json
 
 CHECK_WORDLIST = 'v'
 ADD_TO_WORDLIST = 'a'
-DELETE_FROM_WORDLIST = 'd'
+DELETE_WORDLIST = 'd'
 SELECT_WORDLIST = 's'
 NEW_WORDLIST = 'n'
 ESCAPE = 'q'
@@ -14,6 +14,14 @@ WORDLISTS_FILE_DIR = 'wordlists/'
 
 
 MENU_WIDTH = 60
+
+
+
+def check_file(filename, filepath=WORDLISTS_FILE_DIR):
+    if os.path.exists(filepath + filename):
+        return True
+    else:
+        return False
 
 #write_json({'src':'sedede'}, 'test')
 def write_json(data, filename, filepath=WORDLISTS_FILE_DIR):
@@ -24,20 +32,48 @@ def write_json(data, filename, filepath=WORDLISTS_FILE_DIR):
 def load_file(filename, dir = WORDLISTS_FILE_DIR):
     with open(dir+filename) as data_file:
         data_loaded = json.load(data_file)
-
-
+        return data_loaded
         
+def write_dictionary_file(dict_data, dict_name, dir=WORDLISTS_FILE_DIR):
+    with open(dir + dict_name + '.json', 'w', encoding='utf8') as data_file:
+        json_data = json.dumps(dict_data, indent=4, sort_keys=True, separators=(',', ': '), ensure_ascii=False)
+        data_file.write(str(json_data))
+
+def list_wordlists_files(dir=WORDLISTS_FILE_DIR):
+    files = []
+    for filename in os.listdir(dir):
+        if filename.endswith(".json"):
+            files.append(filename)
+    if not files:
+        return
+    return files
+
+def new_wordlist():
+    lang_a = input('Insert first language: ')
+    lang_b = input('Insert second language: ')
+    if lang_a == '' or lang_b == '':
+        print('You cannot insert empty languages name!!')
+        return
+    file_name = lang_a + '2' + lang_b
+    ret = check_file(file_name + '.json')
+    if ret:
+        inp = input('The file already exists, do you want to overwrite it? [Y/N]')
+        if inp.lower() == 'n':
+            return
+    return file_name
+
+
+
+
+
+
 def get_dict_lang(dict_name):
     pos = dict_name.find('2')
     lang_a = dict_name[0:pos]
     lang_b = dict_name[(pos + 1):len(dict_name)]
     return (lang_a, lang_b) 
 
-def check_file(filename, filepath=WORDLISTS_FILE_DIR):
-    if os.path.exists(filepath + filename):
-        return True
-    else:
-        return False
+
 
 def cls():
     os.system('cls' if os.name == 'nt' else 'clear')
@@ -57,7 +93,7 @@ def generate_main_menu(current_dictionary):
     menu += blank_line
     menu += generate_menu_line(CHECK_WORDLIST + ' - ' + 'View the selected wordlist', MENU_WIDTH)
     menu += generate_menu_line(ADD_TO_WORDLIST + ' - ' + 'Add item to wordlist', MENU_WIDTH)
-    menu += generate_menu_line(DELETE_FROM_WORDLIST + ' - ' + 'Delete item from wordlist', MENU_WIDTH)
+    menu += generate_menu_line(DELETE_WORDLIST + ' - ' + 'Delete wordlist', MENU_WIDTH)
     menu += generate_menu_line(SELECT_WORDLIST + ' - ' + 'Select wordlist', MENU_WIDTH)
     menu += generate_menu_line(NEW_WORDLIST + ' - ' + 'Create new wordlist', MENU_WIDTH)
     menu += generate_menu_line(ESCAPE + ' - ' + 'Save and quit the program', MENU_WIDTH)
@@ -67,40 +103,23 @@ def generate_main_menu(current_dictionary):
     menu += '╚' + '═'*(MENU_WIDTH - 2) + '╝\n'
     return menu
 
-def read_wordlists_files(dir=WORDLISTS_FILE_DIR):
-    files = []
-    for filename in os.listdir(dir):
-        if filename.endswith(".json"):
-            files.append(filename)
-    if not files:
-        return
-    return files
+
 
 def check_wordlist():
     pass
 
-def add_to_wordlist():
-    pass
-    
-
-def new_wordlist():
-    lang_a = input('Insert first language: ')
-    lang_b = input('Insert second language: ')
-    if lang_a == '' or lang_b == '':
-        print('You cannot insert empty languages name!!')
-        return
-    file_name = lang_a + '2' + lang_b
-    ret = check_file(file_name + '.json')
-    if ret:
-        inp = input('The file already exists, do you want to overwrite it? [Y/N]')
-        if inp.lower() == 'n':
-            return
-    return file_name
-    
+def add_to_wordlist(main_dict, current_dict):
+    if current_dict:
+        lang_a, lang_b = get_dict_lang(current_dict)
+        word_a = input('Insert word in {}:'.format(lang_a))
+        word_b = input('Insert word in {}:'.format(lang_b))
+        main_dict[word_a] = word_b
+        return True
+    return -1
     
 
 
-
+    
 
 def main():
 
@@ -115,28 +134,27 @@ def main():
         if inp == CHECK_WORDLIST:
             check_wordlist()
         elif inp == ADD_TO_WORDLIST:
-            if current_dict:
-                lang_a, lang_b = get_dict_lang(current_dict)
-                word_a = input('Insert word in {}:'.format(lang_a))
-                word_b = input('Insert word in {}:'.format(lang_b))
-                main_dict[word_a] = word_b
-
-        elif inp == DELETE_FROM_WORDLIST:
+            ret = add_to_wordlist(main_dict, current_dict)
+            if not ret:
+                print('No wordlist selected, the item has not been written.')
+        elif inp == DELETE_WORDLIST:
             pass
         elif inp == SELECT_WORDLIST:
-            files = read_wordlists_files()
+            write_dictionary_file(main_dict, current_dict)
+            files = list_wordlists_files()
             print('\n')
             for x in range(len(files)):
                 print(files[x][0:len(files[x])-5])
             print('\n')
             inp = input('Enter name: ')
             if inp:
-                if inp in files:
+                if inp+'.json' in files:
                     print('Found!')
                     input()
         elif inp == NEW_WORDLIST:
             current_dict = new_wordlist()
         elif inp == ESCAPE:
+            write_dictionary_file(main_dict, current_dict)
             break
         else:
             cls()
