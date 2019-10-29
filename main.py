@@ -2,6 +2,7 @@
 
 import os
 import json
+import random
 
 CHECK_WORDLIST = 'v'
 ADD_TO_WORDLIST = 'a'
@@ -105,8 +106,15 @@ def generate_main_menu(current_dictionary):
 
 
 
-def check_wordlist():
-    pass
+def check_wordlist(current_dict):
+    while True:
+        lang_a, lang_b = get_dict_lang(current_dict)
+        inp = input('Enter the transaltion from ' + lang_a + ' to ' + lang_b + ': ')
+        
+
+
+        if inp == ESCAPE:
+            break
 
 def add_to_wordlist(main_dict, current_dict):
     if current_dict:
@@ -132,7 +140,7 @@ def main():
         print(generate_main_menu(current_dict))
         inp = input("Select option: ")
         if inp == CHECK_WORDLIST:
-            check_wordlist()
+            check_wordlist(current_dict)
         elif inp == ADD_TO_WORDLIST:
             ret = add_to_wordlist(main_dict, current_dict)
             if not ret:
@@ -150,11 +158,14 @@ def main():
             if inp:
                 if inp+'.json' in files:
                     print('Found!')
-                    input()
+                    current_dict = inp
+                    main_dict = load_file(inp+'.json')
+
         elif inp == NEW_WORDLIST:
             current_dict = new_wordlist()
         elif inp == ESCAPE:
-            write_dictionary_file(main_dict, current_dict)
+            if not current_dict == "":
+                write_dictionary_file(main_dict, current_dict)
             break
         else:
             cls()
