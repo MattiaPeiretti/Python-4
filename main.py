@@ -13,16 +13,9 @@ ESCAPE = 'q'
 
 WORDLISTS_FILE_DIR = 'wordlists/'
 
-
 MENU_WIDTH = 60
 
-
-
-def check_file(filename, filepath=WORDLISTS_FILE_DIR):
-    if os.path.exists(filepath + filename):
-        return True
-    else:
-        return False
+### DICTIONARIES STUFF :)
 
 #write_json({'src':'sedede'}, 'test')
 def write_json(data, filename, filepath=WORDLISTS_FILE_DIR):
@@ -49,25 +42,6 @@ def list_wordlists_files(dir=WORDLISTS_FILE_DIR):
         return
     return files
 
-def new_wordlist():
-    lang_a = input('Insert first language: ')
-    lang_b = input('Insert second language: ')
-    if lang_a == '' or lang_b == '':
-        print('You cannot insert empty languages name!!')
-        return
-    file_name = lang_a + '2' + lang_b
-    ret = check_file(file_name + '.json')
-    if ret:
-        inp = input('The file already exists, do you want to overwrite it? [Y/N]')
-        if inp.lower() == 'n':
-            return
-    return file_name
-
-
-
-
-
-
 def get_dict_lang(dict_name):
     pos = dict_name.find('2')
     lang_a = dict_name[0:pos]
@@ -75,6 +49,7 @@ def get_dict_lang(dict_name):
     return (lang_a, lang_b) 
 
 
+### MENU STUFF 
 
 def cls():
     os.system('cls' if os.name == 'nt' else 'clear')
@@ -83,7 +58,6 @@ def generate_menu_line(text, menu_width):
     space = ' ' * int(menu_width / 10)
     line = '║' + ('{:' + str((menu_width - 2)) + '}').format(space + text) + '║\n'
     return line
-
 
 def generate_main_menu(current_dictionary):
     if current_dictionary == '':
@@ -99,17 +73,26 @@ def generate_main_menu(current_dictionary):
     menu += generate_menu_line(NEW_WORDLIST + ' - ' + 'Create new wordlist', MENU_WIDTH)
     menu += generate_menu_line(ESCAPE + ' - ' + 'Save and quit the program', MENU_WIDTH)
     menu += blank_line
-    menu += generate_menu_line('Slected Wordlist: ' + current_dictionary, MENU_WIDTH)
+    menu += generate_menu_line('Selected Wordlist: ' + current_dictionary, MENU_WIDTH)
     menu += blank_line
     menu += '╚' + '═'*(MENU_WIDTH - 2) + '╝\n'
     return menu
 
+### MAIN FUNCTIONS
 
 
-def check_wordlist(current_dict):
+def check_wordlist(current_dict, main_dict):
     while True:
-        lang_a, lang_b = get_dict_lang(current_dict)
-        inp = input('Enter the transaltion from ' + lang_a + ' to ' + lang_b + ': ')
+        current_word = random.choice(list(main_dict.keys()))
+
+        print(current_word)
+
+        _, lang_b = get_dict_lang(current_dict)
+        inp = input('Enter the transaltion to ' + lang_b + ': ')
+
+        if inp.lower() == main_dict[current_word]:
+            print('im proud of ya son')
+            input()
         
 
 
@@ -117,14 +100,35 @@ def check_wordlist(current_dict):
             break
 
 def add_to_wordlist(main_dict, current_dict):
+
     if current_dict:
         lang_a, lang_b = get_dict_lang(current_dict)
         word_a = input('Insert word in {}:'.format(lang_a))
         word_b = input('Insert word in {}:'.format(lang_b))
-        main_dict[word_a] = word_b
+        main_dict[word_a.lower()] = word_b.lower()
         return True
     return -1
-    
+
+
+################
+def new_wordlist():
+    lang_a = input('Insert first language: ')
+    lang_b = input('Insert second language: ')
+    if lang_a == '' or lang_b == '':
+        print('You cannot insert empty languages name!!')
+        return
+    file_name = lang_a + '2' + lang_b
+    if os.path.exists(file_name + '.json'):
+        inp = input('The file already exists, do you want to overwrite it? [Y/N]')
+        if inp.lower() == 'n':
+            return
+    return file_name
+
+
+    pos = dict_name.find('2')
+    lang_a = dict_name[0:pos]
+    lang_b = dict_name[(pos + 1):len(dict_name)]
+    return (lang_a, lang_b) 
 
 
     
@@ -140,7 +144,7 @@ def main():
         print(generate_main_menu(current_dict))
         inp = input("Select option: ")
         if inp == CHECK_WORDLIST:
-            check_wordlist(current_dict)
+            check_wordlist(current_dict, main_dict)
         elif inp == ADD_TO_WORDLIST:
             ret = add_to_wordlist(main_dict, current_dict)
             if not ret:
